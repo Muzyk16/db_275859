@@ -46,6 +46,11 @@ public class Scanner implements Iterator<Token>, Iterable<Token>
             throw new NoSuchElementException("Scanner input ended.");
         }
 
+        //pomijanie spacji, nowe
+        while(this.character == ' ') {
+            this.readChar();
+        }
+
         char character = this.character;
         Token token;
 
@@ -54,6 +59,18 @@ public class Scanner implements Iterator<Token>, Iterable<Token>
             this.readChar();
         } else if (character == '*') {
             token = this.makeToken(TokenType.MUL);
+            this.readChar();
+        } else if (character == '(') {
+            token = this.makeToken(TokenType.LBR);
+            this.readChar();
+        } else if (character == ')') {
+            token = this.makeToken(TokenType.RBR);
+            this.readChar();
+        } else if (character == '-') {
+            token = this.makeToken(TokenType.SUB);
+            this.readChar();
+        } else if (character == '/') {
+            token = this.makeToken(TokenType.DIV);
             this.readChar();
         } else if (character >= '0' && character <= '9') {
             String value = String.valueOf(character);

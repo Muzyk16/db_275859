@@ -1,6 +1,5 @@
 package pl.edu.agh.tkk17.sample;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class Parser
@@ -39,18 +38,33 @@ public class Parser
     private Node parseNumber()
     {
         this.expect(TokenType.NUM);
-        String value = this.value();
-        this.forward();
-        return new NodeNumber(value);
+//        String value = this.value();
+//        this.forward();
+       //wielocyfrowe liczby, nowe
+        StringBuilder values = new StringBuilder();
+        while(check(TokenType.NUM)) {
+            values.append(this.value());
+            this.forward();
+        }
+
+//        return new NodeNumber(value);
+        return new NodeNumber(values.toString());
+
     }
 
     private Node parseTerm()
     {
-        Node left = this.parseNumber();
+        //Node left = this.parseNumber();
+        Node left = this.parseBrackets();
         if (this.check(TokenType.MUL)) {
             this.forward();
             Node right = this.parseTerm();
             return new NodeMul(left, right);
+            //warunek dzielenie, nowe
+        } else if(this.check(TokenType.DIV)){
+            this.forward();
+            Node right = this.parseTerm();
+            return new NodeDiv(left, right);
         } else {
             return left;
         }
@@ -63,6 +77,11 @@ public class Parser
             this.forward();
             Node right = this.parseExpression();
             return new NodeAdd(left, right);
+            //warunek odejmowanie, nowe
+        } else if (this.check(TokenType.SUB)){
+            this.forward();
+            Node right = this.parseExpression();
+            return new NodeSub(left, right);
         } else {
             return left;
         }
@@ -80,5 +99,18 @@ public class Parser
         Parser parser = new Parser(tokens);
         Node root = parser.parseProgram();
         return root;
+    }
+
+    private Node parseBrackets() {
+        Node left;
+        if (this.check(TokenType.LBR)) {
+            this.forward();
+            left = this.parseExpression();
+            this.expect(TokenType.RBR);
+            this.forward();
+        } else {
+            left = this.parseNumber();
+        }
+        return left;
     }
 }
